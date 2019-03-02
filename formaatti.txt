@@ -1,0 +1,3 @@
+\t\t\tevent 2\n\t\t\t\tdate 2018 1 1\n\t\t\t\t"Itsenï¿½isyyspï¿½ivï¿½n kynttilï¿½myyntituloja"\n\t\t\t\t\n\t\t\t\t\t10001\n\t\t\t\t\t\tmoney 50000\n\t\t\t\t\t40001\n\t\t\t\t\t\tmoney -50000\n
+
+\t\t\tevent {0}\n\t\t\t\tdate {1}\n\t\t\t\t\"{2}\"\n\t\t\t\t\n\t\t\t\t\t{4}\n\t\t\t\t\t\tmoney {5}\n\t\t\t\t\t{6}\n\t\t\t\t\t\tmoney {7}\n .format(event_n, date, msg, pankki_tili, rahasumma kirjanpidossa, sisäinen_tili, rahasumma * -1)
