@@ -14,6 +14,7 @@ namespace kirjuri
         public string Bill_n;
         public string Customer;
         public string Description;
+        public string Internal_Account;
 
         public bool InitBill(string billRow)
         {
@@ -23,6 +24,7 @@ namespace kirjuri
                 ReferenceNumber = fields[4];
                 Customer = fields[3];
                 Description = fields[9];
+                Internal_Account = fields[10];
                 //Debug.WriteLine(fields[7]);
                 Amount = Convert.ToDouble( fields[7], System.Globalization.CultureInfo.InvariantCulture);
                 Bill_n = fields[0];

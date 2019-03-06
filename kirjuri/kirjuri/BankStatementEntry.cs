@@ -13,6 +13,7 @@ namespace kirjuri
         public string TypeMSG;
         public string DescriptionMSG;
         public double Amount;
+        public string InternalAccount;
 
         public bool initBankStatementEntry(string bankStatementEntry)
         {
@@ -27,7 +28,7 @@ namespace kirjuri
                 Debug.WriteLine(Date);
                 FromTo = fields[1].Trim('"');
                 TypeMSG = fields[2].Trim('"');
-                DescriptionMSG = fields[3].Trim('"').Trim('\'');
+                DescriptionMSG = fields[3].Trim('"').Trim('\'').TrimStart('0');
                 Amount = Convert.ToDouble( fields[4].Trim('"'), System.Globalization.CultureInfo.InvariantCulture);
                 return true;
             }

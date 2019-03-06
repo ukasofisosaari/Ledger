@@ -13,14 +13,22 @@
                 <Button Name="btnLoadBillList" Click="BtnLoadBillList_Click" Margin="10">Load Bill list</Button>
                 <Button Name="btnLoadBankStatements" Click="BtnLoadBankStatements_Click" Margin="10">Load Bank statements</Button>
             </WrapPanel>
+            <Button IsEnabled="False" Name="btnStart" Click="BtnStart_Click">Start</Button>
             <WrapPanel>
                 <Label Name="labelEntryNumber">Entry N</Label>
             </WrapPanel>
             <TextBlock Name="textBlckBankStatement" Margin="10" Height="250">Statements will come here</TextBlock>
-            <TextBox Name="textBoxDescriptor" Margin="10">Descriptor</TextBox>
             <WrapPanel>
-                <ComboBox Name="cmbBoxAccountNmb" Margin="10" HorizontalAlignment="Left" Width="100">                </ComboBox>
-                <Button IsEnabled="False" Name="btnOK" Click="BtnOK_Click" HorizontalAlignment="Right">OK</Button>
+                <Label>Ledger entry Description</Label>
+                <TextBox Name="textBoxDescriptor" Margin="10">Descriptor</TextBox>
+            </WrapPanel>
+            <WrapPanel>
+                <Label>Ledger entry Internal account</Label>
+                <ComboBox Name="cmbBoxAccountNmb" Margin="10" HorizontalAlignment="Left" Width="500"
+                          ItemsSource="{Binding InternalAccounts}"
+                          SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
+                          ></ComboBox>
+                <Button IsEnabled="False" Name="btnOK" Click="BtnOK_Click" HorizontalAlignment="Right" Width="50">OK</Button>
             </WrapPanel>
         </StackPanel>
         
