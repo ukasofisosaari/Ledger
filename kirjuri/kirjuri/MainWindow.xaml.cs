@@ -44,6 +44,10 @@ namespace kirjuri
                 _internalAccounts = value;
             }
         }
+
+        private InformationFlags informationFlags;
+        public event EventHandler NextLedgerStatement;
+        private bool CsvLedger;
         public MainWindow()
         {
             InitializeComponent();
@@ -51,6 +55,8 @@ namespace kirjuri
             Debug.WriteLine("Kirjuri started");
             LoadInternalAccounts();
             DataContext = this;
+
+            NextLedgerStatement += LoadNextStatement;
         }
 
         private void LoadInternalAccounts()
@@ -78,8 +84,21 @@ namespace kirjuri
         private void BtnLoadLedger_Click(object sender, RoutedEventArgs e)
         {
             _ledgerName = GetFilename("Lataa tilikirja");
+            string ext = System.IO.Path.GetExtension(_ledgerName);
+            if(ext == ".csv")
+            {
+                CsvLedger = true;
+            }
+            if( ext == ".kitupiikki")
+            {
+                CsvLedger = false;
+            }
+            else
+            {
+                //TODO: Popup alerting not supported
+            }
             //Load accounts from ledger
-            CheckPreRequisites();
+            CheckPreRequisites(InformationFlags.Ledger);
 
         }
 
@@ -98,7 +117,7 @@ namespace kirjuri
                     Debug.WriteLine(billEntry.Amount);
 
                 }
-                CheckPreRequisites();
+                CheckPreRequisites(InformationFlags.Bills);
             }
             else
             {
@@ -121,11 +140,7 @@ namespace kirjuri
 
                 }
                 bankStatements.Reverse();
-                /*foreach(BankStatementEntry entry in bankStatements)
-                {
-                    Debug.WriteLine(String.Format("{0} {1} {2} {3}", entry.Date, entry.DescriptionMSG, entry.Amount, entry.FromTo));
-                }*/
-                CheckPreRequisites();
+                CheckPreRequisites(InformationFlags.Bankstatements);
             }
             else
             {
@@ -133,20 +148,10 @@ namespace kirjuri
             }
         }
 
-        private void CheckPreRequisites()
+        private void CheckPreRequisites(InformationFlags flags)
         {
-            //Tämä ei toimi, tee bitti operaatioilla! TODO
-            int flag = 0;
-            if(_ledgerName != "")
-            {
-                flag += 1;
-            }
-            if (bankStatements.Count() > 0)
-            {
-
-                flag += 1;
-            }
-            if (flag == 2)
+            informationFlags |= flags;
+            if (informationFlags.HasFlag(InformationFlags.All))
             {
                 btnStart.IsEnabled = true;
             }
@@ -156,22 +161,29 @@ namespace kirjuri
         {
             _eventN = 1;
             _statementN = 0;
-            LoadNextStatement();
+            NextLedgerStatement(this, EventArgs.Empty);
             btnOK.IsEnabled = true;
             btnStart.IsEnabled = false;
         }
 
         private void BtnOK_Click(object sender, RoutedEventArgs e)
         {
-            //Save current statement info as event
-            _eventN += 1;
-            _statementN += 1;
+            if (CsvLedger)
+            {
+                SaveOntoLedgerFile();
+            }
+            else
+            {
+                SaveOntoDB();
+            }
+        }
 
+        private void SaveOntoLedgerFile()
+        {
             BankStatementEntry entry = bankStatements[_statementN];
-            LoadNextStatement();
             string internalAccount = SelectedAccount.Split(' ')[0];
             string ledgerEntryTemplate = "\n\t\t\tevent {0}\n\t\t\t\tdate {1}\n\t\t\t\t\"{2}\"\n\t\t\t\t\n\t\t\t\t\t{3}\n\t\t\t\t\t\tmoney {4}\n\t\t\t\t\t{5}\n\t\t\t\t\t\tmoney {6}";
-            _ledgerEntry = string.Format(ledgerEntryTemplate, 
+            _ledgerEntry = string.Format(ledgerEntryTemplate,
                 _eventN,
                 entry.Date,
                 textBoxDescriptor.Text,
@@ -182,10 +194,19 @@ namespace kirjuri
             Debug.WriteLine(_ledgerEntry);
             File.AppendAllText(_ledgerName, _ledgerEntry);
             SelectedAccount = "";
+            NextLedgerStatement(this, EventArgs.Empty);
         }
 
-        private void LoadNextStatement()
+        private void SaveOntoDB()
         {
+
+        }
+
+        private void LoadNextStatement(object sender, EventArgs e)
+        {
+            //Save current statement info as event
+            _eventN += 1;
+            _statementN += 1;
             BankStatementEntry entry = bankStatements[_statementN];
             labelEntryNumber.Content = _statementN.ToString();
             if (bills.ContainsKey(entry.DescriptionMSG))

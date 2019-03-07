@@ -68,6 +68,7 @@
     </Compile>
     <Compile Include="BankStatementEntry.cs" />
     <Compile Include="BillEntry.cs" />
+    <Compile Include="defs.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
