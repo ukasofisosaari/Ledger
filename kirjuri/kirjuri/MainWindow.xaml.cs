@@ -159,7 +159,8 @@ namespace kirjuri
 
         private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
-            _eventN = 1;
+            _eventN = Convert.ToInt32(textBoxEvent.Text) + 1;
+            Debug.WriteLine(_eventN);
             _statementN = 0;
             NextLedgerStatement(this, EventArgs.Empty);
             btnOK.IsEnabled = true;
@@ -176,13 +177,18 @@ namespace kirjuri
             {
                 SaveOntoDB();
             }
+            _eventN += 1;
+            _statementN += 1;
+            NextLedgerStatement(this, EventArgs.Empty);
         }
 
         private void SaveOntoLedgerFile()
         {
             BankStatementEntry entry = bankStatements[_statementN];
             string internalAccount = SelectedAccount.Split(' ')[0];
-            string ledgerEntryTemplate = "\n\t\t\tevent {0}\n\t\t\t\tdate {1}\n\t\t\t\t\"{2}\"\n\t\t\t\t\n\t\t\t\t\t{3}\n\t\t\t\t\t\tmoney {4}\n\t\t\t\t\t{5}\n\t\t\t\t\t\tmoney {6}";
+            Debug.WriteLine(internalAccount);
+            Debug.WriteLine(SelectedAccount);
+            string ledgerEntryTemplate = "\n\t\t\tevent {0}\n\t\t\t\tdate {1}\n\t\t\t\t\"{2}\"\n\t\t\t\t\n\t\t\t\t\t{3}\n\t\t\t\t\t\tmoney {4}00\n\t\t\t\t\t{5}\n\t\t\t\t\t\tmoney {6}00";
             _ledgerEntry = string.Format(ledgerEntryTemplate,
                 _eventN,
                 entry.Date,
@@ -193,8 +199,6 @@ namespace kirjuri
                 entry.Amount * -1);
             Debug.WriteLine(_ledgerEntry);
             File.AppendAllText(_ledgerName, _ledgerEntry);
-            SelectedAccount = "";
-            NextLedgerStatement(this, EventArgs.Empty);
         }
 
         private void SaveOntoDB()
@@ -205,24 +209,24 @@ namespace kirjuri
         private void LoadNextStatement(object sender, EventArgs e)
         {
             //Save current statement info as event
-            _eventN += 1;
-            _statementN += 1;
             BankStatementEntry entry = bankStatements[_statementN];
             labelEntryNumber.Content = _statementN.ToString();
             if (bills.ContainsKey(entry.DescriptionMSG))
             {
-                entry.InternalAccount = _internalAccounts.FirstOrDefault(s => s.Contains(bills[entry.DescriptionMSG].Internal_Account));
+                //entry.InternalAccount = _internalAccounts.FirstOrDefault(s => s.Contains(bills[entry.DescriptionMSG].Internal_Account));
                 entry.DescriptionMSG = string.Format("{0} {1}",
                     bills[entry.DescriptionMSG].Customer,
                     bills[entry.DescriptionMSG].Description);
-                SelectedAccount = entry.InternalAccount;
+                //SelectedAccount = entry.InternalAccount;
 
             }
+            Debug.WriteLine(entry.Amount.ToString("N2"));
+            Debug.WriteLine(entry.Amount);
             textBoxDescriptor.Text = entry.DescriptionMSG;
             textBlckBankStatement.Text = string.Format("Bank statement info:\nMessage: {0}\nSender: \n{1}\nSum: {2}\nDate: {3}\n", 
                 entry.DescriptionMSG,
                 entry.FromTo,
-                entry.Amount,
+                entry.Amount.ToString("N2"),
                 entry.Date);
         }
     }

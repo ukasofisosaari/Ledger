@@ -12,6 +12,8 @@
                 <Button Name="btnLoadLedger" Click="BtnLoadLedger_Click" Margin="10">Load Ledger</Button>
                 <Button Name="btnLoadBillList" Click="BtnLoadBillList_Click" Margin="10">Load Bill list</Button>
                 <Button Name="btnLoadBankStatements" Click="BtnLoadBankStatements_Click" Margin="10">Load Bank statements</Button>
+                <Label>Ledger last entry number</Label>
+                <TextBox Name="textBoxEvent" Margin="10" MinWidth="20">Last entry N</TextBox>
             </WrapPanel>
             <Button IsEnabled="False" Name="btnStart" Click="BtnStart_Click">Start</Button>
             <WrapPanel>
@@ -20,7 +22,7 @@
             <TextBlock Name="textBlckBankStatement" Margin="10" Height="250">Statements will come here</TextBlock>
             <WrapPanel>
                 <Label>Ledger entry Description</Label>
-                <TextBox Name="textBoxDescriptor" Margin="10">Descriptor</TextBox>
+                <TextBox Name="textBoxDescriptor" Margin="10" MinWidth="200">Descriptor</TextBox>
             </WrapPanel>
             <WrapPanel>
                 <Label>Ledger entry Internal account</Label>

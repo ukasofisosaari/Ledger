@@ -29,7 +29,9 @@ namespace kirjuri
                 FromTo = fields[1].Trim('"');
                 TypeMSG = fields[2].Trim('"');
                 DescriptionMSG = fields[3].Trim('"').Trim('\'').TrimStart('0');
-                Amount = Convert.ToDouble( fields[4].Trim('"'), System.Globalization.CultureInfo.InvariantCulture);
+                Amount = Convert.ToDouble( fields[4].Trim('"'));
+                Debug.WriteLine(Amount);
+                Debug.WriteLine(Amount.ToString("N2"));
                 return true;
             }
             catch (System.IndexOutOfRangeException)
