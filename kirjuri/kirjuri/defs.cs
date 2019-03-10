@@ -16,6 +16,8 @@ namespace kirjuri
         Bills = 2,
         //Bank statements have been given
         Bankstatements = 4,
-        All = 7
+        //Event number
+        Event_N = 8,
+        All = 15
     }
 }

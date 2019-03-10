@@ -13,7 +13,7 @@
                 <Button Name="btnLoadBillList" Click="BtnLoadBillList_Click" Margin="10">Load Bill list</Button>
                 <Button Name="btnLoadBankStatements" Click="BtnLoadBankStatements_Click" Margin="10">Load Bank statements</Button>
                 <Label>Ledger last entry number</Label>
-                <TextBox Name="textBoxEvent" Margin="10" MinWidth="20">Last entry N</TextBox>
+                <TextBox Name="textBoxEvent" Margin="10" MinWidth="50" KeyUp="TextBoxEvent_KeyUp" PreviewTextInput="TextBoxEvent_PreviewTextInput"></TextBox>
             </WrapPanel>
             <Button IsEnabled="False" Name="btnStart" Click="BtnStart_Click">Start</Button>
             <WrapPanel>
@@ -32,7 +32,7 @@
                           ></ComboBox>
                 <Button IsEnabled="False" Name="btnOK" Click="BtnOK_Click" HorizontalAlignment="Right" Width="50">OK</Button>
             </WrapPanel>
+            <Button IsEnabled="False" Name="btnSavePaidBillsFile" Click="BtnSavePaidBillsFile_Click">Tallenna maksetut laskut lista</Button>
         </StackPanel>
-        
     </Grid>
 </Window>

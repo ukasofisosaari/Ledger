@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.IO;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace kirjuri
 {
@@ -26,6 +27,8 @@ namespace kirjuri
     {
         private Dictionary<string, BillEntry> bills = new Dictionary<string, BillEntry>();
         private List<BankStatementEntry> bankStatements = new List<BankStatementEntry>();
+
+        private List<string> paidBills = new List<string>();
         private string _ledgerName;
         private int _eventN;
         private int _statementN;
@@ -160,6 +163,7 @@ namespace kirjuri
         private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
             _eventN = Convert.ToInt32(textBoxEvent.Text) + 1;
+            textBoxEvent.IsEnabled = false;
             Debug.WriteLine(_eventN);
             _statementN = 0;
             NextLedgerStatement(this, EventArgs.Empty);
@@ -180,6 +184,7 @@ namespace kirjuri
             _eventN += 1;
             _statementN += 1;
             NextLedgerStatement(this, EventArgs.Empty);
+            btnSavePaidBillsFile.IsEnabled = true;
         }
 
         private void SaveOntoLedgerFile()
@@ -213,11 +218,13 @@ namespace kirjuri
             labelEntryNumber.Content = _statementN.ToString();
             if (bills.ContainsKey(entry.DescriptionMSG))
             {
+                string billReference = entry.DescriptionMSG;
                 //entry.InternalAccount = _internalAccounts.FirstOrDefault(s => s.Contains(bills[entry.DescriptionMSG].Internal_Account));
                 entry.DescriptionMSG = string.Format("{0} {1}",
-                    bills[entry.DescriptionMSG].Customer,
-                    bills[entry.DescriptionMSG].Description);
+                    bills[billReference].Customer,
+                    bills[billReference].Description);
                 //SelectedAccount = entry.InternalAccount;
+                paidBills.Add(bills[billReference].Bill_n);
 
             }
             Debug.WriteLine(entry.Amount.ToString("N2"));
@@ -228,6 +235,38 @@ namespace kirjuri
                 entry.FromTo,
                 entry.Amount.ToString("N2"),
                 entry.Date);
+        }
+
+        private void BtnSavePaidBillsFile_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog savePaidsBillsFile = new SaveFileDialog();
+
+            savePaidsBillsFile.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            savePaidsBillsFile.FilterIndex = 2;
+            savePaidsBillsFile.RestoreDirectory = true;
+
+            if (savePaidsBillsFile.ShowDialog() == true)
+            {
+                    // Code to write the stream goes here.
+                    StreamWriter writer = new StreamWriter(savePaidsBillsFile.FileName);
+                    foreach (String s in paidBills)
+                    {
+                        writer.WriteLine(s);
+                    }
+                writer.Close();
+            }
+        }
+
+        private void TextBoxEvent_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void TextBoxEvent_KeyUp(object sender, KeyEventArgs e)
+        {
+
+            CheckPreRequisites(InformationFlags.Event_N);
         }
     }
 }
