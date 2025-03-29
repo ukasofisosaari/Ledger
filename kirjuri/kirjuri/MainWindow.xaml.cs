@@ -2,16 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.IO;
 using System.Diagnostics;
@@ -91,10 +83,11 @@ namespace kirjuri
             string ext = System.IO.Path.GetExtension(_ledgerName);
             if(ext == ".csv")
             {
-
+                FetchEventN();
                 LoadInternalAccounts();
                 CsvLedger = true;
             }
+            // Not Implemented really
             if( ext == ".kitupiikki")
             {
                 CsvLedger = false;
@@ -215,6 +208,26 @@ namespace kirjuri
             }
         }
 
+        private void FetchEventN()
+        {
+            int event_n = 0;
+            foreach (string line in File.ReadLines(_ledgerName, Encoding.GetEncoding("iso-8859-1")))
+            {
+                Debug.WriteLine(line);
+                string pattern = @"event (\d+)";
+                Match match = Regex.Match(line, pattern);
+
+                if (match.Success)
+                {
+                    event_n = int.Parse(match.Groups[1].Value);
+                }
+            }
+            _eventN = event_n;
+            textBoxEvent.Text = _eventN.ToString();
+            Console.WriteLine("The number is: " + _eventN);
+            CheckPreRequisites(InformationFlags.Event_N);
+        }
+
         private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
             paidBills.Clear();
@@ -260,6 +273,8 @@ namespace kirjuri
 
         private void BtnOK_Click(object sender, RoutedEventArgs e)
         {
+            Console.WriteLine(_statementN);
+            Console.WriteLine(bankStatements.Count);
             if (CsvLedger)
             {
                 SaveOntoLedgerFile();
@@ -274,26 +289,39 @@ namespace kirjuri
             btnSavePaidBillsFile.IsEnabled = true;
         }
 
+        private void DoneDialog()
+        {
+            MessageBox.Show("Out of Banks statements", "Out of Bank statements", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         private void SaveOntoLedgerFile()
         {
-            BankStatementEntry entry = bankStatements[_statementN];
-            string internalAccount = SelectedAccount.Split(' ')[0];
-            Debug.WriteLine(internalAccount);
-            Debug.WriteLine(SelectedAccount);
-            int amountInt = Convert.ToInt32(entry.Amount * 100);
-            string ledgerEntryTemplate = "\n\t\t\tevent {0}\n\t\t\t\tdate {1}\n\t\t\t\t\"{2}\"\n\t\t\t\t\n\t\t\t\t\t{3}\n\t\t\t\t\t\tmoney {4}\n\t\t\t\t\t{5}\n\t\t\t\t\t\tmoney {6}";
-            _ledgerEntry = string.Format(ledgerEntryTemplate,
-                _eventN,
-                entry.Date,
-                textBoxDescriptor.Text,
-                "10003",
-                amountInt.ToString(),
-                internalAccount,
-                (amountInt * -1).ToString());
-            Debug.WriteLine(_ledgerEntry);
-            File.AppendAllText(_ledgerName, _ledgerEntry);
-            string readText = File.ReadAllText(_ledgerName);
-            Console.WriteLine(readText);
+            try
+            {
+                BankStatementEntry entry = bankStatements[_statementN];
+                string internalAccount = SelectedAccount.Split(' ')[0];
+                Debug.WriteLine(internalAccount);
+                Debug.WriteLine(SelectedAccount);
+                int amountInt = Convert.ToInt32(entry.Amount * 100);
+                string ledgerEntryTemplate = "\n\t\t\tevent {0}\n\t\t\t\tdate {1}\n\t\t\t\t\"{2}\"\n\t\t\t\t\n\t\t\t\t\t{3}\n\t\t\t\t\t\tmoney {4}\n\t\t\t\t\t{5}\n\t\t\t\t\t\tmoney {6}";
+                _ledgerEntry = string.Format(ledgerEntryTemplate,
+                    _eventN,
+                    entry.Date,
+                    textBoxDescriptor.Text,
+                    "10003",
+                    amountInt.ToString(),
+                    internalAccount,
+                    (amountInt * -1).ToString());
+                Debug.WriteLine(_ledgerEntry);
+                File.AppendAllText(_ledgerName, _ledgerEntry);
+                string readText = File.ReadAllText(_ledgerName);
+                Console.WriteLine(readText);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                DoneDialog();
+            }
+            
         }
 
         private void SaveOntoDB()
@@ -331,7 +359,7 @@ namespace kirjuri
             catch (System.ArgumentOutOfRangeException)
             {
                 Debug.WriteLine("At the end");
-                // TODO At the end, how to handle
+                DoneDialog();
             }
         }
 
@@ -363,7 +391,6 @@ namespace kirjuri
 
         private void TextBoxEvent_KeyUp(object sender, KeyEventArgs e)
         {
-
             CheckPreRequisites(InformationFlags.Event_N);
         }
     }
